@@ -69,6 +69,26 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 </fieldset>
 
 <fieldset>
+<legend>Good for <span class="hint" style="font-weight:400">(tick all that fit)</span></legend>
+<div id="occasions" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px 12px">
+<label class="check"><input type="checkbox" value="study"> Study spot</label>
+<label class="check"><input type="checkbox" value="remote-work"> Remote work</label>
+<label class="check"><input type="checkbox" value="birthday-shoot"> Birthday shoot</label>
+<label class="check"><input type="checkbox" value="date-night"> Date night</label>
+<label class="check"><input type="checkbox" value="brunch"> Brunch</label>
+<label class="check"><input type="checkbox" value="budget-eats"> Budget eats</label>
+<label class="check"><input type="checkbox" value="group-hangout"> Group hangout</label>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Creator posts <span class="hint" style="font-weight:400">(optional)</span></legend>
+<p style="margin:0;font-size:14px;color:#5B6B62">TikTok or Instagram posts made at this café. Only add a post once the creator has said yes to being featured; posts without that tick are left off the page.</p>
+<div id="posts"></div>
+<div class="actions"><button type="button" id="addPost">+ Add a creator post</button></div>
+</fieldset>
+
+<fieldset>
 <legend>Links and source</legend>
 <div class="row">
 <div><label for="instagram">Instagram handle <span class="hint">(no @)</span></label><input id="instagram" autocomplete="off"></div>
@@ -146,11 +166,40 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   }
   $('addSection').addEventListener('click', function () { addSection().focus(); });
 
+  var postsEl = $('posts');
+  function field(label, input) { return el('label', {}, [document.createTextNode(label), input]); }
+  function addPost(data) {
+    data = data || {};
+    var creator = el('input', { class: 'pcreator', autocomplete: 'off' });
+    var handle = el('input', { class: 'phandle', autocomplete: 'off', placeholder: 'without @' });
+    var platform = el('select', { class: 'pplatform' });
+    [['', 'Choose…'], ['tiktok', 'TikTok'], ['instagram', 'Instagram'], ['youtube', 'YouTube'], ['x', 'X']].forEach(function (o) { platform.appendChild(el('option', { value: o[0], text: o[1] })); });
+    var url = el('input', { class: 'purl', type: 'url', autocomplete: 'off', placeholder: 'https://' });
+    var date = el('input', { class: 'pdate', type: 'date' });
+    var caption = el('input', { class: 'pcaption', autocomplete: 'off', placeholder: 'e.g. Best iced latte in Osu' });
+    var ok = el('input', { class: 'pok', type: 'checkbox' });
+    var del = el('button', { type: 'button', text: 'Remove post' });
+    creator.value = data.creator || ''; handle.value = (data.handle || '').replace(/^@/, ''); platform.value = data.platform || '';
+    url.value = data.url || ''; date.value = data.date || ''; caption.value = data.caption || ''; ok.checked = data.permission === true;
+    var box = el('div', { class: 'section post' }, [
+      el('div', { class: 'row' }, [field('Creator name', creator), field('Handle', handle)]),
+      el('div', { class: 'row' }, [field('Platform', platform), field('Date posted', date)]),
+      field('Link to the post', url), field('Short caption (optional)', caption),
+      el('label', { class: 'check' }, [ok, document.createTextNode('The creator agreed to be featured')]),
+      el('div', { class: 'actions' }, [del])
+    ]);
+    del.addEventListener('click', function () { box.remove(); render(); });
+    postsEl.appendChild(box);
+    return creator;
+  }
+  $('addPost').addEventListener('click', function () { addPost().focus(); render(); });
+
   function collect() {
     var v = function (id) { return $(id).value.trim(); };
     var cafe = {
       slug: v('slug'), name: v('name'), area: v('area'), type: v('type'),
-      wifi: v('wifi'), laptopFriendly: $('laptop').checked
+      wifi: v('wifi'), laptopFriendly: $('laptop').checked,
+      occasions: [].filter.call($('occasions').querySelectorAll('input'), function (i) { return i.checked; }).map(function (i) { return i.value; })
     };
     if (v('address')) cafe.address = v('address');
     if (v('about')) cafe.about = v('about');
@@ -168,6 +217,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         }).filter(function (it) { return it.name || it.price != null; })
       };
     }).filter(function (s) { return s.name || s.items.length; });
+    cafe.posts = [].map.call(postsEl.querySelectorAll('.post'), function (b) {
+      var q = function (c) { return b.querySelector(c).value.trim(); };
+      var p = { creator: q('.pcreator'), handle: q('.phandle').replace(/^@/, ''), platform: q('.pplatform'), url: q('.purl') };
+      if (q('.pdate')) p.date = q('.pdate');
+      if (q('.pcaption')) p.caption = q('.pcaption');
+      p.permission = b.querySelector('.pok').checked;
+      return p;
+    }).filter(function (p) { return p.creator || p.handle || p.url; });
     return cafe;
   }
 
@@ -190,6 +247,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
       });
     });
     if (!count) p.push('Add at least one menu item with a price.');
+    c.posts.forEach(function (post, i) {
+      var who = post.creator || post.handle || 'Creator post ' + (i + 1);
+      if (!post.handle) p.push(who + ': add the handle.');
+      if (!post.platform) p.push(who + ': choose the platform.');
+      if (!/^https:\/\//.test(post.url)) p.push(who + ': add the https link to the post.');
+    });
     return p;
   }
 
@@ -219,6 +282,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
       var c = JSON.parse(t);
       ['name', 'slug', 'area', 'type', 'address', 'about', 'wifi', 'instagram', 'website', 'source', 'checked'].forEach(function (k) { if ($(k)) $(k).value = c[k] || ''; });
       $('laptop').checked = !!c.laptopFriendly;
+      [].forEach.call($('occasions').querySelectorAll('input'), function (i) { i.checked = (c.occasions || []).indexOf(i.value) > -1; });
+      postsEl.innerHTML = '';
+      (c.posts || []).forEach(addPost);
       slugTouched = true;
       sectionsEl.innerHTML = '';
       (c.sections || []).forEach(addSection);

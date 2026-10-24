@@ -6,6 +6,10 @@
   "type": "Café",
   "wifi": "yes",
   "laptopFriendly": true,
+  "occasions": [
+    "remote-work",
+    "brunch"
+  ],
   "about": "All-day café at One Airport Square serving breakfast, salads, rice dishes, fresh juices and cocktails.",
   "instagram": "lovecafekwae",
   "website": "https://www.lovecafekwae.com",
@@ -244,5 +248,6 @@
         }
       ]
     }
-  ]
+  ],
+  "posts": []
 }

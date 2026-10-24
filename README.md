@@ -38,4 +38,9 @@ Public menu pages live under `/menus/` (the finder) and `/menus/<café>/` (one p
 2. Run `node menus/build.mjs` from the repo root (Node 18+). It rewrites `menus/index.html`, every `menus/<slug>/index.html` and `sitemap.xml`.
 3. Commit the JSON and the generated files, then push. Vercel serves them as static pages, no build settings needed.
 
+### Occasions and creators
+
+- **Occasions** (`occasions` in the JSON, ticked in the form): `study`, `remote-work`, `birthday-shoot`, `date-night`, `brunch`, `budget-eats`, `group-hangout`. Each one used by at least one café gets its own page at `/menus/for/<occasion>/` (e.g. "Study spots in Accra") and a filter chip on the finder. To add a new occasion, add it to `OCCASIONS` in `menus/build.mjs` and a checkbox in `menus/add.html`.
+- **Creator posts** (`posts`): `creator`, `handle`, `platform` (`tiktok`, `instagram`, `youtube`, `x`), `url`, optional `date` and `caption`, and `permission`. A post only appears when `permission` is `true`, meaning the creator agreed to be featured; the build skips the rest and says how many it skipped. Posts show in a "Seen on" section on the café page and link out to the original. Every creator with an approved post gets a page at `/menus/creators/<handle>/` listing all their spots, plus a directory at `/menus/creators/`.
+
 Each page has a "Claim this page on WhatsApp" button and a correction/removal link, and says where and when the menu was taken from. Submit `https://chopaafrica.com/sitemap.xml` in Google Search Console so the pages get indexed.
