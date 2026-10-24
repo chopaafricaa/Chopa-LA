@@ -1,0 +1,248 @@
+{
+  "slug": "cafe-kwae",
+  "name": "Café Kwae",
+  "area": "Airport City",
+  "address": "1 Airport Square, Ground Floor, Airport City, Accra",
+  "type": "Café",
+  "wifi": "yes",
+  "laptopFriendly": true,
+  "about": "All-day café at One Airport Square serving breakfast, salads, rice dishes, fresh juices and cocktails.",
+  "instagram": "lovecafekwae",
+  "website": "https://www.lovecafekwae.com",
+  "source": "https://www.lovecafekwae.com/menus/",
+  "checked": "2026-10-24",
+  "sections": [
+    {
+      "name": "Boozy Cocktails",
+      "items": [
+        {
+          "name": "Aperol Spritz",
+          "price": 90
+        },
+        {
+          "name": "Aloha Spirit",
+          "price": 90
+        },
+        {
+          "name": "Apata Bi Ase",
+          "price": 60
+        },
+        {
+          "name": "Kwae's G & T",
+          "price": 90
+        },
+        {
+          "name": "Kwae's Mimosa",
+          "price": 90
+        }
+      ]
+    },
+    {
+      "name": "Beverages",
+      "items": [
+        {
+          "name": "Pineapple, Lime, Turmeric & Ginger",
+          "price": 65
+        },
+        {
+          "name": "Beetroot, Pineapple & Ginger",
+          "price": 55
+        },
+        {
+          "name": "Sugarcane Lime & Ginger",
+          "price": 55
+        },
+        {
+          "name": "Chai Latte",
+          "price": 60
+        },
+        {
+          "name": "Matcha Latte",
+          "price": 65
+        },
+        {
+          "name": "Turmeric Latte",
+          "price": 55
+        },
+        {
+          "name": "CK's Homemade Hot Ginger Tea",
+          "price": 35
+        },
+        {
+          "name": "Frozen Hot Chocolate",
+          "price": 60
+        },
+        {
+          "name": "Vanilla Milkshake",
+          "price": 65
+        },
+        {
+          "name": "Fula Milkshake",
+          "price": 75
+        },
+        {
+          "name": "Decadent Brownie Shake",
+          "price": 90
+        }
+      ]
+    },
+    {
+      "name": "Small Plates",
+      "items": [
+        {
+          "name": "Spicy Beef Wontons",
+          "price": 80
+        },
+        {
+          "name": "Beef Samosas",
+          "price": 60
+        },
+        {
+          "name": "Kwae's Salt & Pepper Calamari",
+          "price": 120
+        },
+        {
+          "name": "Vegetable Spring Rolls",
+          "price": 60
+        }
+      ]
+    },
+    {
+      "name": "Sandwiches",
+      "items": [
+        {
+          "name": "Breakfast Sandwich",
+          "price": 110
+        },
+        {
+          "name": "Tuna Sweetcorn",
+          "price": 130
+        },
+        {
+          "name": "Sugar Bread French Toast",
+          "price": 100
+        },
+        {
+          "name": "Alagbe's French Toast",
+          "price": 150
+        },
+        {
+          "name": "Grilled Chicken Wrap",
+          "price": 110
+        },
+        {
+          "name": "Chicken Club Sandwich",
+          "price": 115
+        }
+      ]
+    },
+    {
+      "name": "Salads",
+      "items": [
+        {
+          "name": "Waldorf Chicken Salad",
+          "price": 135
+        },
+        {
+          "name": "Beef Bacon Avocado",
+          "price": 185
+        },
+        {
+          "name": "Chicken Avocado Salad",
+          "price": 140
+        },
+        {
+          "name": "Tuna Salad",
+          "price": 145
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "items": [
+        {
+          "name": "Full CK English Breakfast",
+          "price": 190
+        },
+        {
+          "name": "GH Style Pancakes",
+          "price": 90
+        },
+        {
+          "name": "Pancakes for Breakfast",
+          "price": 130
+        },
+        {
+          "name": "Café Kwae Rice Pot",
+          "price": 165
+        },
+        {
+          "name": "Chicken Curry",
+          "price": 130
+        },
+        {
+          "name": "Jerk Prawns & Plantains",
+          "price": 220
+        },
+        {
+          "name": "Quinoa Vegetable Stir Fry",
+          "price": 110
+        },
+        {
+          "name": "Veggie Breakfast",
+          "price": 100
+        },
+        {
+          "name": "Pan-seared Grouper",
+          "price": 140
+        },
+        {
+          "name": "Seafood Pasta",
+          "price": 220
+        }
+      ]
+    },
+    {
+      "name": "Sides",
+      "items": [
+        {
+          "name": "Fries",
+          "price": 50
+        },
+        {
+          "name": "Sautéed Potatoes",
+          "price": 45
+        },
+        {
+          "name": "House Salad",
+          "price": 50
+        },
+        {
+          "name": "Steamed Veggies",
+          "price": 50
+        }
+      ]
+    },
+    {
+      "name": "Desserts",
+      "items": [
+        {
+          "name": "Lemon Cake",
+          "price": 60
+        },
+        {
+          "name": "Banana Chocolate Chip Cake",
+          "price": 65
+        },
+        {
+          "name": "Decadent Chocolate Brownie",
+          "price": 50
+        },
+        {
+          "name": "Brownie Sundae",
+          "price": 90
+        }
+      ]
+    }
+  ]
+}

@@ -29,3 +29,13 @@ The form checks that name, phone, restaurant name, location and the confirmation
 ## Fonts
 
 Headings use Saira ExtraBold Italic from Google Fonts. Body text uses the system font stack.
+
+## Café menu pages
+
+Public menu pages live under `/menus/` (the finder) and `/menus/<café>/` (one page per café). They are generated from JSON files, so nobody edits the HTML by hand.
+
+1. Add or edit a file in `menus/data/`, e.g. `menus/data/dear-lola.json`. Copy `cafe-kwae.json` as the template: `slug`, `name`, `area`, `type`, `wifi` (`yes`/`no`/`unknown`), `laptopFriendly`, `about`, `address`, `instagram`, `website`, `source` (where the menu came from), `checked` (date you checked it, `YYYY-MM-DD`) and `sections` with `items` (`name`, `price` in cedis, optional `description`).
+2. Run `node menus/build.mjs` from the repo root (Node 18+). It rewrites `menus/index.html`, every `menus/<slug>/index.html` and `sitemap.xml`.
+3. Commit the JSON and the generated files, then push. Vercel serves them as static pages, no build settings needed.
+
+Each page has a "Claim this page on WhatsApp" button and a correction/removal link, and says where and when the menu was taken from. Submit `https://chopaafrica.com/sitemap.xml` in Google Search Console so the pages get indexed.
