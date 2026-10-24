@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Log a café menu | Chopa team</title>
+<link rel="icon" href="/chopa-logo.png">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FAF8F3;color:#16211C;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.5}
+.top{background:#0B3D2A;color:#fff;padding:16px}
+.top h1{margin:0;font-size:22px}
+.top p{margin:4px 0 0;color:#D3E3D9;font-size:14px}
+main{max-width:760px;margin:0 auto;padding:16px}
+fieldset{border:1px solid #E4DED2;border-radius:12px;background:#fff;padding:16px;margin:0 0 16px}
+legend{font-weight:700;color:#0B3D2A;padding:0 6px}
+label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+label .hint{font-weight:400;color:#5B6B62}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #CFC8BA;border-radius:8px;background:#fff}
+textarea{min-height:64px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+.check{display:flex;align-items:center;gap:8px;font-weight:600;margin-top:12px}
+.check input{width:auto}
+.section{border:1px solid #CFC8BA;border-radius:10px;padding:12px;margin-top:12px}
+.item{display:grid;grid-template-columns:1fr 110px 36px;gap:8px;margin-top:8px}
+.item .desc{grid-column:1 / 3}
+button{cursor:pointer;border-radius:8px;padding:10px 14px;border:1px solid #0B3D2A;background:#fff;color:#0B3D2A}
+button.primary{background:#F2B33D;border-color:#F2B33D;font-weight:600}
+button.x{padding:0;border-color:#CFC8BA;color:#8A3B2E}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#errors{color:#8A3B2E;font-weight:600}
+pre{white-space:pre-wrap;word-break:break-word;background:#0B3D2A;color:#E2ECE5;padding:12px;border-radius:8px;font-size:12px;max-height:320px;overflow:auto}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #F2B33D;outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="top">
+<h1>Log a café menu</h1>
+<p>For the Chopa team. Fill this in, download the file, put it in <code>menus/data/</code>, then run <code>node menus/build.mjs</code>.</p>
+</div>
+<main>
+<form id="f" novalidate>
+
+<fieldset>
+<legend>Café</legend>
+<label for="name">Café name</label>
+<input id="name" required autocomplete="off">
+<label for="slug">Page address <span class="hint">(made from the name; letters, numbers and dashes)</span></label>
+<input id="slug" required pattern="[a-z0-9-]+" autocomplete="off">
+<div class="row">
+<div><label for="area">Area</label><input id="area" required placeholder="e.g. Osu" autocomplete="off"></div>
+<div><label for="type">Type</label>
+<select id="type" required><option value="">Choose…</option><option>Café</option><option>Restaurant</option><option>Bakery</option><option>Chop bar</option><option>Bar</option></select></div>
+</div>
+<label for="address">Address <span class="hint">(optional)</span></label>
+<input id="address" autocomplete="off">
+<label for="about">One-line description <span class="hint">(optional)</span></label>
+<textarea id="about"></textarea>
+</fieldset>
+
+<fieldset>
+<legend>Working there</legend>
+<label for="wifi">Wifi</label>
+<select id="wifi" required><option value="">Choose…</option><option value="yes">Yes</option><option value="no">No</option><option value="unknown">Not sure</option></select>
+<label class="check"><input type="checkbox" id="laptop"> Good for working on a laptop</label>
+</fieldset>
+
+<fieldset>
+<legend>Links and source</legend>
+<div class="row">
+<div><label for="instagram">Instagram handle <span class="hint">(no @)</span></label><input id="instagram" autocomplete="off"></div>
+<div><label for="website">Website <span class="hint">(optional)</span></label><input id="website" type="url" autocomplete="off"></div>
+</div>
+<label for="source">Where the menu came from <span class="hint">(link to the post, page or PDF)</span></label>
+<input id="source" type="url" required autocomplete="off">
+<label for="checked">Date you checked the prices</label>
+<input id="checked" type="date" required>
+</fieldset>
+
+<fieldset>
+<legend>Menu</legend>
+<div id="sections"></div>
+<div class="actions"><button type="button" id="addSection">+ Add a section</button></div>
+</fieldset>
+
+<p id="errors" role="alert"></p>
+<div class="actions">
+<button type="submit" class="primary">Check and download file</button>
+<button type="button" id="copy">Copy file text</button>
+</div>
+<label for="load">Or edit an existing file <span class="hint">(open a .json from menus/data/)</span></label>
+<input type="file" id="load" accept="application/json">
+<p id="done" role="status" style="color:#0B3D2A;font-weight:600"></p>
+<pre id="preview" aria-label="File preview"></pre>
+</form>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var sectionsEl = $('sections');
+  var slugTouched = false;
+
+  function slugify(s) {
+    return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+  $('name').addEventListener('input', function () { if (!slugTouched) $('slug').value = slugify(this.value); });
+  $('slug').addEventListener('input', function () { slugTouched = true; });
+
+  function el(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); });
+    (kids || []).forEach(function (c) { e.appendChild(c); });
+    return e;
+  }
+
+  function addItem(list, data) {
+    data = data || {};
+    var name = el('input', { 'aria-label': 'Item name', placeholder: 'Item', class: 'iname' });
+    var price = el('input', { 'aria-label': 'Price in cedis', placeholder: 'GH₵', type: 'number', min: '0', step: '0.5', inputmode: 'decimal', class: 'iprice' });
+    var del = el('button', { type: 'button', class: 'x', 'aria-label': 'Remove item', text: '×' });
+    var desc = el('input', { 'aria-label': 'Item description (optional)', placeholder: 'Description (optional)', class: 'idesc desc' });
+    name.value = data.name || ''; price.value = data.price != null ? data.price : ''; desc.value = data.description || '';
+    var row = el('div', { class: 'item' }, [name, price, del, desc]);
+    del.addEventListener('click', function () { row.remove(); render(); });
+    list.appendChild(row);
+    return name;
+  }
+
+  function addSection(data) {
+    data = data || {};
+    var title = el('input', { 'aria-label': 'Section name', placeholder: 'Section, e.g. Breakfast', class: 'sname' });
+    title.value = data.name || '';
+    var list = el('div', { class: 'items' });
+    var addBtn = el('button', { type: 'button', text: '+ Add item' });
+    var delBtn = el('button', { type: 'button', text: 'Remove section' });
+    var box = el('div', { class: 'section' }, [title, list, el('div', { class: 'actions' }, [addBtn, delBtn])]);
+    addBtn.addEventListener('click', function () { addItem(list).focus(); });
+    delBtn.addEventListener('click', function () { if (confirm('Remove this section and its items?')) { box.remove(); render(); } });
+    (data.items && data.items.length ? data.items : [null]).forEach(function (it) { addItem(list, it); });
+    sectionsEl.appendChild(box);
+    return title;
+  }
+  $('addSection').addEventListener('click', function () { addSection().focus(); });
+
+  function collect() {
+    var v = function (id) { return $(id).value.trim(); };
+    var cafe = {
+      slug: v('slug'), name: v('name'), area: v('area'), type: v('type'),
+      wifi: v('wifi'), laptopFriendly: $('laptop').checked
+    };
+    if (v('address')) cafe.address = v('address');
+    if (v('about')) cafe.about = v('about');
+    if (v('instagram')) cafe.instagram = v('instagram').replace(/^@/, '');
+    if (v('website')) cafe.website = v('website');
+    cafe.source = v('source');
+    cafe.checked = v('checked');
+    cafe.sections = [].map.call(sectionsEl.querySelectorAll('.section'), function (s) {
+      return {
+        name: s.querySelector('.sname').value.trim(),
+        items: [].map.call(s.querySelectorAll('.item'), function (r) {
+          var it = { name: r.querySelector('.iname').value.trim(), price: r.querySelector('.iprice').value === '' ? null : Number(r.querySelector('.iprice').value) };
+          var d = r.querySelector('.idesc').value.trim(); if (d) it.description = d;
+          return it;
+        }).filter(function (it) { return it.name || it.price != null; })
+      };
+    }).filter(function (s) { return s.name || s.items.length; });
+    return cafe;
+  }
+
+  function problems(c) {
+    var p = [];
+    if (!c.name) p.push('Add the café name.');
+    if (!/^[a-z0-9-]+$/.test(c.slug)) p.push('Page address can only use lowercase letters, numbers and dashes.');
+    if (!c.area) p.push('Add the area.');
+    if (!c.type) p.push('Choose the type.');
+    if (!c.wifi) p.push('Say whether there is wifi.');
+    if (!/^https?:\/\//.test(c.source)) p.push('Add the link the menu came from.');
+    if (!c.checked) p.push('Add the date you checked the prices.');
+    var count = 0;
+    c.sections.forEach(function (s, i) {
+      if (!s.name) p.push('Section ' + (i + 1) + ' needs a name.');
+      s.items.forEach(function (it) {
+        count++;
+        if (!it.name) p.push('An item in "' + (s.name || 'section ' + (i + 1)) + '" has a price but no name.');
+        if (it.price == null || !(it.price > 0)) p.push('"' + (it.name || 'An item') + '" needs a price above 0.');
+      });
+    });
+    if (!count) p.push('Add at least one menu item with a price.');
+    return p;
+  }
+
+  function render() { $('preview').textContent = JSON.stringify(collect(), null, 2); }
+  $('f').addEventListener('input', render);
+
+  $('f').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var c = collect(), p = problems(c);
+    $('done').textContent = '';
+    $('errors').textContent = p.join(' ');
+    if (p.length) return;
+    var blob = new Blob([JSON.stringify(c, null, 2) + '\n'], { type: 'application/json' });
+    var a = el('a', { href: URL.createObjectURL(blob), download: c.slug + '.json' });
+    document.body.appendChild(a); a.click(); a.remove();
+    $('done').textContent = 'Downloaded ' + c.slug + '.json. Put it in menus/data/ and run node menus/build.mjs.';
+  });
+
+  $('copy').addEventListener('click', function () {
+    var text = JSON.stringify(collect(), null, 2) + '\n';
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { $('done').textContent = 'Copied.'; }, function () { $('done').textContent = 'Could not copy; select the preview text instead.'; });
+  });
+
+  $('load').addEventListener('change', function () {
+    var file = this.files[0]; if (!file) return;
+    file.text().then(function (t) {
+      var c = JSON.parse(t);
+      ['name', 'slug', 'area', 'type', 'address', 'about', 'wifi', 'instagram', 'website', 'source', 'checked'].forEach(function (k) { if ($(k)) $(k).value = c[k] || ''; });
+      $('laptop').checked = !!c.laptopFriendly;
+      slugTouched = true;
+      sectionsEl.innerHTML = '';
+      (c.sections || []).forEach(addSection);
+      if (!sectionsEl.children.length) addSection();
+      $('errors').textContent = ''; $('done').textContent = 'Loaded ' + file.name + '.';
+      render();
+    }).catch(function () { $('errors').textContent = 'That file is not a valid menu file.'; });
+  });
+
+  addSection();
+  render();
+})();
+</script>
+</body>
+</html>

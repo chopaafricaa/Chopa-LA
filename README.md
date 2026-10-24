@@ -34,7 +34,7 @@ Headings use Saira ExtraBold Italic from Google Fonts. Body text uses the system
 
 Public menu pages live under `/menus/` (the finder) and `/menus/<café>/` (one page per café). They are generated from JSON files, so nobody edits the HTML by hand.
 
-1. Add or edit a file in `menus/data/`, e.g. `menus/data/dear-lola.json`. Copy `cafe-kwae.json` as the template: `slug`, `name`, `area`, `type`, `wifi` (`yes`/`no`/`unknown`), `laptopFriendly`, `about`, `address`, `instagram`, `website`, `source` (where the menu came from), `checked` (date you checked it, `YYYY-MM-DD`) and `sections` with `items` (`name`, `price` in cedis, optional `description`).
+1. Open `/menus/add.html` (in the browser, or on the live site at chopaafrica.com/menus/add.html; it is hidden from Google). Fill in the café, its wifi, where the menu came from, and each section with items and prices, then press **Check and download file**. It checks for missing names and prices and downloads `<slug>.json`. To change a café later, use **Or edit an existing file** to load its JSON back in. Put the file in `menus/data/`. You can also write the JSON by hand; the fields are: `slug`, `name`, `area`, `type`, `wifi` (`yes`/`no`/`unknown`), `laptopFriendly`, `about`, `address`, `instagram`, `website`, `source` (where the menu came from), `checked` (date you checked it, `YYYY-MM-DD`) and `sections` with `items` (`name`, `price` in cedis, optional `description`).
 2. Run `node menus/build.mjs` from the repo root (Node 18+). It rewrites `menus/index.html`, every `menus/<slug>/index.html` and `sitemap.xml`.
 3. Commit the JSON and the generated files, then push. Vercel serves them as static pages, no build settings needed.
 
